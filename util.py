@@ -6,6 +6,7 @@ Created on Sun Oct  5 02:39:23 2014
 """
 
 import requests
+import re
 from requests.auth import HTTPDigestAuth
 import json
 from flask import Flask, jsonify, render_template
@@ -19,6 +20,27 @@ REUTERS_TRIAL_SEARCH = 'https://lsapi-demo.thomson-pharma.com/ls-api-ws/ws/rs/tr
 REUTERS_CONF_SEARCH = 'https://lsapi-demo.thomson-pharma.com/ls-api-ws/ws/rs/conference-v1/conference/search'
 REUTERS_PRESS_SEARCH= 'https://lsapi-demo.thomson-pharma.com/ls-api-ws/ws/rs/pressRelease-v1/pressRelease/search'
 
+def getTweets(query):
+    URL = 'http://otter.topsy.com/searchdate.json'
+
+    params = {
+        'apikey': '09C43A9B270A470B8EB8F2946A9369F3',
+        'perpage': 100,
+        'q': query,
+        'window': 'a',
+        'zoom': 10,
+        'locale': 'en'}
+
+    result = requests.get(URL, params=params)
+
+    try:
+        data = result.json()
+    except:
+        print result.content
+        raise
+
+    return data['response']['list']
+
 def get_from_thomson_reuters(url, params):
     auth = HTTPDigestAuth('Hackathon_09','AUIZ2BWTFR5M679E')
     
@@ -26,7 +48,6 @@ def get_from_thomson_reuters(url, params):
         params['fmt'] = 'json'
     
     resp = requests.get(url, params=params, auth=auth)
-    print resp.content
     return resp.json()
     
 def get_literature_for(search_string):
@@ -77,7 +98,6 @@ def get_trials_for(search_string):
         resp = get_from_thomson_reuters(REUTERS_TRIAL_SEARCH + search_string, {})
         with open(cache_file_name, 'w') as f:
             json.dump(resp, f)
-    print resp
     return resp['trialResultsOutput']['SearchResults']['Trial']
 
 
@@ -115,7 +135,7 @@ def get_press_for(search_string):
             json.dump(resp, f)
     return resp['pressReleaseResultsOutput']['SearchResults']['PressRelease']
 
-@app.route('/<search_string>')
+@app.route('/reuter/<search_string>')
 def process_data_web(search_string):
     data = get_trials_for(search_string)
     return jsonify({'results': data})
@@ -123,6 +143,11 @@ def process_data_web(search_string):
 @app.route('/')
 def derp():
     return render_template('index.html')
+
+@app.route('/twitter/<search_string>')
+def query_data(search_string):
+    data = getTweets(search_string)
+    return jsonify({'results': data})
             
 def process_data_trial(search_string):
     with open('ebola_trials_2.json', 'r') as f:
