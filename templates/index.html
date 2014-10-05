@@ -1,0 +1,129 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+
+{% block content %}
+<style>
+#chart_container {
+  position: relative;
+  font-family: Arial, Helvetica, sans-serif;
+}
+#chart {
+  position: relative;
+  left: 40px;
+}
+#y_axis {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+}
+
+</style>
+<div class="container">
+  <h1>Medical Trial Sentiment for <span class="thingy"></span></h1>
+ 
+
+<div id="chart_container">
+  <div id="y_axis"></div>
+  <div id="chart"></div>
+</div>
+ <form method="GET">
+    <input name="query" type="text" />
+    <input type="submit" />
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/rickshaw/1.4.6/rickshaw.js"></script>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/rickshaw/1.4.6/rickshaw.min.css">
+
+  <script type="text/javascript">
+
+    var processed_data = null;
+    var graph_data = [];
+    function get_reuters_data(search) {
+      return $.get('http://localhost:5000/' + search);
+    }
+
+    function analyze_sentiment(text) {
+        var URL = 'https://api.idolondemand.com/1/api/sync/analyzesentiment/v1';
+        var API_KEY = 'e7ecaa10-d9fd-46c7-8dfb-b6abff1b78ed';
+
+        params = {
+            text: text, 
+            apikey: API_KEY
+        };
+        return $.get(URL, params);
+    }
+
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    $('.thingy').html(getParameterByName('query'));
+
+    get_reuters_data(getParameterByName('query')).success(function(data) {
+      console.log(data);
+      data.results.sort(function (a, b) { return (new Date(a.DateStart)).getTime() - (new Date(b.DateStart)).getTime(); });
+
+      processed_data = [];
+      for (var i = 0; i < data.results.length; i++) {
+        graph_data[i] = {x: new Date(data.results[i].DateStart).getTime(), y: 0};
+      }
+      var graph = new Rickshaw.Graph( {
+        element: document.querySelector("#chart"),
+        width: 1000,
+        height: 400,
+        min: 'auto',
+        renderer: 'line',
+        series: [ {
+                color: 'steelblue',
+                data: graph_data
+        } ]
+      } );
+var time = new Rickshaw.Fixtures.Time();
+// var months = time.unit('year');
+// var x_axis = new Rickshaw.Graph.Axis.Time( { graph: graph, timeUnit: months } );
+
+var y_axis = new Rickshaw.Graph.Axis.Y( {
+  graph: graph,
+  orientation: 'left',
+  tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+  element: document.getElementById('y_axis'),
+} );
+
+      for (var i = 0; i < data.results.length; i++) {
+        processed_data[i] = data.results[i];
+        (function (idx, val) {
+            analyze_sentiment(val.Teaser).success(function (out) {
+              processed_data[idx].sentiment = out;
+              graph_data[idx].y = out.aggregate.score;
+              graph.render();
+              // yAxis.render();
+      
+            });
+        })(i, data.results[i]);
+      }
+
+       graph.render();
+    });
+
+
+    // for(var i=0; i < processed_data.length; i++){
+    //   processed_data[i].sentiment
+    // }
+
+  </script>
+{% endblock %}
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+{% endblock %}

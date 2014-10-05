@@ -1,8 +1,5 @@
-
-
-      "created_at": "Sun Oct 05 00:25:24 +0000 2014",
-      "text": "eu vi um cosplay da ebola chan",
-
+"created_at": "Sun Oct 05 00:25:24 +0000 2014",
+"text": "eu vi um cosplay da ebola chan",
 
         "created_at": "Sat Nov 19 22:44:16 +0000 2011",
 
@@ -73,7 +70,8 @@
 
 
       "created_at": "Sun Oct 05 00:25:24 +0000 2014",
-      "text": "RT @Green_Footballs: I wonder if all the conservatives yelling that Ebola might become airborne realize it means they now believe in evolut…",
+      "text": "RT @Green_Footballs: I wonder if all the conservatives yelling that Ebola might become airborne realize it means they now believe in evolut
+",
 
 
         "created_at": "Mon Dec 26 10:12:37 +0000 2011",
@@ -169,6 +167,5 @@
 
         "created_at": "Fri Oct 03 21:06:17 +0000 2014",
         "text": "US AIR TRAVEL EBOLA SCREENING FORM 630(D)\nDo you have Ebola?\n? Yes\n? No\nPlease mark your answer legibly in ink or blood",
-
 
           "created_at": "Sun May 30 15:14:33 +0000 2010",

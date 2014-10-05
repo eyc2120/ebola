@@ -1,0 +1,49 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+
+{% block content %}
+<div class="container">
+  <h1>Hello, world!</h1>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+
+  <script type="text/javascript">
+    var processed_data = null;
+    function get_reuters_data(search) {
+      return $.get('http://localhost:5000/' + search);
+    }
+
+    function analyze_sentiment(text) {
+        var URL = 'https://api.idolondemand.com/1/api/sync/analyzesentiment/v1';
+        var API_KEY = 'e7ecaa10-d9fd-46c7-8dfb-b6abff1b78ed';
+
+        params = {
+            text: text, 
+            apikey: API_KEY
+        };
+        return $.get(URL, params);
+    }
+
+
+    get_reuters_data('ebola').success(function(data) {
+      console.log(data);
+      processed_data = [];
+      for (var i = 0; i < data.results.length; i++) {
+        processed_data[i] = data.results[i];
+        (function (idx, val) {
+            analyze_sentiment(val.Teaser).success(function (out) {
+              processed_data[idx].sentiment = out;
+            });
+        })(i, data.results[i]);
+      }
+    });
+  </script>
+{% endblock %}
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+{% endblock %}
