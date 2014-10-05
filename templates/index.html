@@ -22,6 +22,7 @@
   display: inline-block;
   vertical-align: top;
   margin: 0 0 0 10px;
+  float: right;
 }
 </style>
 
@@ -102,9 +103,11 @@
       min: 'auto',
       renderer: 'line',
       series: [ {
+        name: "TR Medical Trial Data",
         color: 'steelblue',
         data: reuters_data
       }, {
+        name: "Twitter Data",
         color: 'red',
         data: twitter_data
       } ]
@@ -149,16 +152,24 @@
         (function (idx, val) {
             analyze_sentiment(val.content).success(function (out) {
               console.log("AJAX request successfully completed");
-              count++;
               twitter_data[idx].y = out.aggregate.score;
               if (reuters_data.length > 0) {
                 graph.render(); 
               }
+              count++;
+              document.getElementById("counter").innerHTML = count + "% of tweets loaded.";
+            }).error(function () {
+              count++;
               document.getElementById("counter").innerHTML = count + "% of tweets loaded.";
             });
           })(i, data.results[i]);
         }
       });
+
+    var legend = new Rickshaw.Graph.Legend( {
+        element: document.querySelector('#legend'),
+        graph: graph
+} );
   </script>
 {% endblock %}
 {% block head %}
