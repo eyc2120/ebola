@@ -1,0 +1,109 @@
+{
+  "positive": [
+    {
+      "sentiment": "supportive",
+      "topic": null,
+      "score": 0.6280145725181376,
+      "original_text": "be supportive",
+      "original_length": 13,
+      "normalized_text": "be supportive",
+      "normalized_length": 13
+    },
+    {
+      "sentiment": "supportive",
+      "topic": null,
+      "score": 0.6280145725181376,
+      "original_text": "be supportive",
+      "original_length": 13,
+      "normalized_text": "be supportive",
+      "normalized_length": 13
+    },
+    {
+      "sentiment": "answer legibly in",
+      "topic": null,
+      "score": 0.5274215517597863,
+      "original_text": "answer legibly in ink",
+      "original_length": 21,
+      "normalized_text": "answer legibly in ink",
+      "normalized_length": 21
+    },
+    {
+      "sentiment": "answer legibly in",
+      "topic": null,
+      "score": 0.5274215517597863,
+      "original_text": "answer legibly in ink",
+      "original_length": 21,
+      "normalized_text": "answer legibly in ink",
+      "normalized_length": 21
+    }
+  ],
+  "negative": [
+    {
+      "sentiment": "The sick",
+      "topic": "passenger and his daughter",
+      "score": -0.5685799620527161,
+      "original_text": "The sick passenger and his daughter",
+      "original_length": 35,
+      "normalized_text": "The sick passenger and his daughter",
+      "normalized_length": 35
+    },
+    {
+      "sentiment": "infect",
+      "topic": null,
+      "score": -0.5274215517597863,
+      "original_text": "infect everybody fuck",
+      "original_length": 21,
+      "normalized_text": "infect everybody fuck",
+      "normalized_length": 21
+    },
+    {
+      "sentiment": "like dying",
+      "topic": null,
+      "score": -0.42279137987234977,
+      "original_text": "like dying alone this america",
+      "original_length": 29,
+      "normalized_text": "like dying alone this america",
+      "normalized_length": 29
+    },
+    {
+      "sentiment": "infect",
+      "topic": null,
+      "score": -0.5274215517597863,
+      "original_text": "infect everybody fuck",
+      "original_length": 21,
+      "normalized_text": "infect everybody fuck",
+      "normalized_length": 21
+    },
+    {
+      "sentiment": "like dying",
+      "topic": null,
+      "score": -0.42279137987234977,
+      "original_text": "like dying alone this america",
+      "original_length": 29,
+      "normalized_text": "like dying alone this america",
+      "normalized_length": 29
+    },
+    {
+      "sentiment": "shit",
+      "topic": "Cya bada wid dis Ebola",
+      "score": -0.7056231101697462,
+      "original_text": "Cya bada wid dis Ebola shit ennuh....",
+      "original_length": 37,
+      "normalized_text": "Cya bada wid dis Ebola shit ennuh....",
+      "normalized_length": 37
+    },
+    {
+      "sentiment": "The sick",
+      "topic": "passenger and his daughter",
+      "score": -0.5685799620527161,
+      "original_text": "The sick passenger and his daughter",
+      "original_length": 35,
+      "normalized_text": "The sick passenger and his daughter",
+      "normalized_length": 35
+    }
+  ],
+  "aggregate": {
+    "sentiment": "negative",
+    "score": -0.13021242263487298
+  }
+}
