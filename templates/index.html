@@ -47,7 +47,7 @@
     var processed_data = null;
     var graph_data = [];
     function get_reuters_data(search) {
-      return $.get('http://localhost:5000/' + search);
+      return $.get('/' + search);
     }
 
     function analyze_sentiment(text) {
