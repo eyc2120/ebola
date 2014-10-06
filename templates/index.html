@@ -3,44 +3,8 @@
 {% import "bootstrap/fixes.html" as fixes %}
 
 {% block content %}
-<style>
-#chart_container {
-  position: relative;
-  font-family: Arial, Helvetica, sans-serif;
-}
-#chart {
-  position: relative;
-  left: 40px;
-}
-#y_axis {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 40px;
-}
-#legend {
-  display: inline-block;
-  vertical-align: top;
-  margin: 0 0 0 10px;
-  float: right;
-}
-</style>
-
 <div class="container">
-  <h1>Medical Trial Sentiment for <span class="thingy"></span></h1>
- 
-
-<div id="chart_container">
-  <div id="y_axis"></div>
-  <div id="chart"></div>
-  <div id="legend"></div>
-</div>
-
-<div id="counter"></div>
- <form method="GET">
-    <input name="query" type="text" />
-    <input type="submit" />
-  </form>
+  <h1>Hello, world!</h1>
 </div>
 {% endblock %}
 
@@ -49,127 +13,57 @@
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/rickshaw/1.4.6/rickshaw.js"></script>
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/rickshaw/1.4.6/rickshaw.min.css">
+
+  <div id="chart"></div>
 
   <script type="text/javascript">
+   
+  
+  var data = [ { x: 1910, y: 92228531 }, { x: 1920, y: 106021568 }, { x: 1930, y: 123202660 }, { x: 1940, y: 132165129 }, { x: 1950, y: 151325798 }, { x: 1960, y: 179323175 }, { x: 1970, y: 203211926 }, { x: 1980, y: 226545805 }, { x: 1990, y: 248709873 }, { x: 2000, y: 281421906 }, { x: 2010, y: 308745538 } ];
 
-    var reuters_data = [{x:0,y:0}];
-    var twitter_data = [{x:0,y:0}];
+  var graph = new Rickshaw.Graph( {
+        element: document.querySelector("#chart"),
+        width: 580,
+        height: 250,
+        series: [ {
+                color: 'steelblue',
+                data: data
+        } ]
+  } );
+
+  graph.render();
+
+    var processed_data = null;
     function get_reuters_data(search) {
-      return $.get('/reuter/' + search);
-    }
-
-    function get_twitter_data(search) {
-      return $.get('/twitter/' + search);
+      return $.get('http://localhost:5000/' + search);
     }
 
     function analyze_sentiment(text) {
         var URL = 'https://api.idolondemand.com/1/api/sync/analyzesentiment/v1';
         var API_KEY = 'e7ecaa10-d9fd-46c7-8dfb-b6abff1b78ed';
 
-        if (text.indexOf('http://t.co') >= 0) {
-          groups = text.match(/(http:\/\/t.co\/[a-zA-Z0-9]+)/);
-          if (groups) {
-            url = groups[1];
-          }
-        } else {
-          url = false;
-        }
-
         params = {
+            text: text, 
             apikey: API_KEY
         };
-        if (url) {
-          params.url = url;
-        } else {
-          params.text = text;
-        }
         return $.get(URL, params);
     }
 
-    function getParameterByName(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-            results = regex.exec(location.search);
-        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    }
-
-    $('.thingy').html(getParameterByName('query'));
-
-    var graph = new Rickshaw.Graph( {
-      element: document.querySelector("#chart"),
-      width: 1000,
-      height: 400,
-      min: 'auto',
-      renderer: 'line',
-      series: [ {
-        name: "TR Medical Trial Data",
-        color: 'steelblue',
-        data: reuters_data
-      }, {
-        name: "Twitter Data",
-        color: 'red',
-        data: twitter_data
-      } ]
-    });
-    var time = new Rickshaw.Fixtures.Time();
-    var x_axis = new Rickshaw.Graph.Axis.Time({graph: graph, timeUnit: time.unit('6 month')});
-    var y_axis = new Rickshaw.Graph.Axis.Y( {
-      graph: graph,
-      orientation: 'left',
-      tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
-      element: document.getElementById('y_axis'),
-    });
-
-    get_reuters_data(getParameterByName('query')).success(function(data) {
-      data.results.sort(function (a, b) { return (new Date(a.DateStart)).getTime() - (new Date(b.DateStart)).getTime(); });
-
+    get_reuters_data('ebola').success(function(data) {
+      console.log(data);
+      processed_data = [];
       for (var i = 0; i < data.results.length; i++) {
-        reuters_data[i] = {x: new Date(data.results[i].DateStart).getTime() / 1000, y: 0};
-      }
-
-      for (var i = 0; i < data.results.length; i++) {
+        processed_data[i] = data.results[i];
         (function (idx, val) {
             analyze_sentiment(val.Teaser).success(function (out) {
-              reuters_data[idx].y = out.aggregate.score;
-              if (twitter_data.length > 0) {
-                graph.render(); 
-              }
+              processed_data[idx].sentiment = out;
             });
         })(i, data.results[i]);
       }
     });
 
-    get_twitter_data(getParameterByName('query')).success(function(data) {
-      data.results.sort(function(a, b) { return a.date - b.date; });
+    console.log(processed_data[0]);
 
-      for (var i = 0; i < data.results.length; i++) {
-        twitter_data[i] = {x: data.results[i].date, y: 0};
-      }
-
-      var count = 0;
-      for (var i = 0; i < data.results.length; i++) {
-        (function (idx, val) {
-            analyze_sentiment(val.content).success(function (out) {
-              console.log("AJAX request successfully completed");
-              twitter_data[idx].y = out.aggregate.score;
-              if (reuters_data.length > 0) {
-                graph.render(); 
-              }
-              count++;
-              document.getElementById("counter").innerHTML = count + "% of tweets loaded.";
-            }).error(function () {
-              count++;
-              document.getElementById("counter").innerHTML = count + "% of tweets loaded.";
-            });
-          })(i, data.results[i]);
-        }
-      });
-
-    var legend = new Rickshaw.Graph.Legend( {
-        element: document.querySelector('#legend'),
-        graph: graph
-} );
   </script>
 {% endblock %}
 {% block head %}
